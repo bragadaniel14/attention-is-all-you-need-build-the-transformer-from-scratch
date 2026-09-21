@@ -240,8 +240,15 @@ def project_to_query_key_value(x, w_q, b_q, w_k, b_k, w_v, b_v):
     # TODO: project x into separate query, key, and value tensors via three linear layers
     return apply_linear_projection(x, w_q, b_q), apply_linear_projection(x, w_k, b_k), apply_linear_projection(x, w_v, b_v)
 
-# Step 28 - split_qkv_into_heads (not yet solved)
-# TODO: implement
+# Step 28 - split_qkv_into_heads
+import torch
+
+def split_qkv_into_heads(q, k, v, num_heads):
+    # TODO: split each of q, k, v into (B, num_heads, L, d_k) and return as a tuple
+    B, L, d_model = q.shape
+    return transpose_heads_before_sequence(split_last_dim_into_heads(q,num_heads)), \
+    transpose_heads_before_sequence(split_last_dim_into_heads(k,num_heads)),\
+    transpose_heads_before_sequence(split_last_dim_into_heads(v,num_heads))
 
 # Step 29 - multi_head_scaled_dot_product_attention (not yet solved)
 # TODO: implement
