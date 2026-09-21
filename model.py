@@ -59,10 +59,7 @@ import torch
 
 def compute_positional_div_term(d_model):
     # TODO: return a 1D FloatTensor of length d_model // 2 holding the sinusoidal frequency divisors
-    pos = torch.arange(0,d_model,2)
-    extra = torch.pow(10000, -pos/d_model)
-
-    return extra
+    return torch.pow(10000, torch.tensor([-2*d/d_model for d in range(d_model // 2)]))
 
 # Step 9 - build_position_index_column
 import torch
