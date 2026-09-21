@@ -187,7 +187,7 @@ import torch
 def scaled_dot_product_attention(query, key, value, mask=None):
     """Run scaled dot-product attention; return (context, attention_weights)."""
     # TODO: chain raw scores, scale by sqrt(d_k), optionally mask, softmax, then mix values
-
+    """
     raw_scores = compute_raw_attention_scores(query, key)
     scores = scale_attention_scores(raw_scores, query.shape[-1])
     if mask is not None:
@@ -197,23 +197,15 @@ def scaled_dot_product_attention(query, key, value, mask=None):
     return apply_attention_weights_to_values(attention_weights, value), attention_weights
 
     """
-    print(1)
+    
     new_query = query @  key.transpose(-2,-1)
-    print(1)
     new_query /= math.sqrt(query.shape[-1])
-    print(1)
-    if mask:
-        print(1)
-        mask_fill = torch.where(mask, -torch.inf, 0)
-        print(1)
+    if mask is not None:
+        mask_fill = torch.where(mask, 0, -torch.inf)
         new_query += mask_fill
-    print(1)
     softmax = torch.softmax(new_query, axis=-1)
-    print(1)
     softmax = torch.where(softmax.isnan(), 0, softmax)
-    print(softmax.shape, value.shape)
-    return softmax @ value
-    """
+    return softmax @ value, softmax
 
 # Step 23 - split_last_dim_into_heads (not yet solved)
 # TODO: implement
