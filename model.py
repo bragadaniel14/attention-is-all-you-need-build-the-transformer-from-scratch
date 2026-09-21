@@ -397,8 +397,16 @@ def apply_final_output_projection(decoder_output, output_projection_weight, outp
     mult = decoder_output @ output_projection_weight.T + (0 if output_projection_bias is None else output_projection_bias)
     return mult
 
-# Step 49 - tie_output_projection_to_token_embeddings (not yet solved)
-# TODO: implement
+# Step 49 - tie_output_projection_to_token_embeddings
+import torch
+
+def tie_output_projection_to_token_embeddings(token_embedding_weight):
+    """Return an output projection weight that shares storage with token_embedding_weight.
+
+    Input shape: (vocab_size, d_model). Output shape: (d_model, vocab_size).
+    """
+    # TODO: return an output projection weight tied to the token embedding matrix
+    return token_embedding_weight.transpose(0,1)
 
 # Step 50 - apply_log_softmax_over_vocab (not yet solved)
 # TODO: implement
