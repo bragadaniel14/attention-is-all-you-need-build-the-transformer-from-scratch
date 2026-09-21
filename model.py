@@ -36,10 +36,8 @@ def decode_ids_to_tokens(ids, id_to_token):
 # Step 5 - pad_id_sequence
 def pad_id_sequence(ids, max_len, pad_id):
     # TODO: return a list of length exactly max_len, padding with pad_id or truncating.
-    n =  max_len - len(ids)
-    if n >= 0:
-        return ids + n*[pad_id]
-    return ids[:max_len]
+    new_ids = ids[:max_len]
+    return new_ids + [pad_id] * max(0, max_len-len(new_ids))
 
 # Step 6 - stack_padded_sequences_to_batch
 import torch
