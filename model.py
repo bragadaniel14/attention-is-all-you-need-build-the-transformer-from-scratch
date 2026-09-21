@@ -67,7 +67,7 @@ import torch
 def build_position_index_column(max_len):
     """Return a (max_len, 1) float tensor of [0, 1, ..., max_len-1]."""
     # TODO: build a column vector of position indices from 0 to max_len-1
-    return torch.tensor(range(max_len), dtype=torch.float).reshape(-1,1)
+    return torch.arange(max_len).view((max_len,1)).float()
 
 # Step 10 - fill_even_indices_with_sin
 import torch
