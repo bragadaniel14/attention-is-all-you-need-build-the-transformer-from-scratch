@@ -247,8 +247,8 @@ def split_qkv_into_heads(q, k, v, num_heads):
     # TODO: split each of q, k, v into (B, num_heads, L, d_k) and return as a tuple
     B, L, d_model = q.shape
     return transpose_heads_before_sequence(split_last_dim_into_heads(q,num_heads)), \
-    transpose_heads_before_sequence(split_last_dim_into_heads(k,num_heads)),\
-    transpose_heads_before_sequence(split_last_dim_into_heads(v,num_heads))
+        transpose_heads_before_sequence(split_last_dim_into_heads(k,num_heads)),\
+        transpose_heads_before_sequence(split_last_dim_into_heads(v,num_heads))
 
 # Step 29 - multi_head_scaled_dot_product_attention (not yet solved)
 # TODO: implement
