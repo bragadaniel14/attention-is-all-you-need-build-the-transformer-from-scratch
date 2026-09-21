@@ -469,8 +469,36 @@ def init_encoder_layer_parameters(d_model, num_heads, d_ff):
 
     return params
 
-# Step 53 - init_decoder_layer_parameters (not yet solved)
-# TODO: implement
+# Step 53 - init_decoder_layer_parameters
+import torch
+
+def init_decoder_layer_parameters(d_model, num_heads, d_ff):
+    # TODO: return a dict of requires_grad tensors for one decoder layer
+    params = {}
+    params['w_q_self'] =(torch.randn((d_model, d_model))* 0.1).requires_grad_(True)
+    params['w_k_self'] = (torch.randn((d_model, d_model))* 0.1).requires_grad_(True)
+    params['w_v_self'] = (torch.randn((d_model, d_model))* 0.1).requires_grad_(True)
+    params['w_o_self'] = (torch.randn((d_model, d_model))* 0.1).requires_grad_(True)
+
+    params['w_q_cross'] =(torch.randn((d_model, d_model))* 0.1).requires_grad_(True)
+    params['w_k_cross'] = (torch.randn((d_model, d_model))* 0.1).requires_grad_(True)
+    params['w_v_cross'] = (torch.randn((d_model, d_model))* 0.1).requires_grad_(True)
+    params['w_o_cross'] = (torch.randn((d_model, d_model))* 0.1).requires_grad_(True)
+
+    params['w1'] = (torch.randn((d_model, d_ff))* 0.1).requires_grad_(True)
+    params['w2'] = (torch.randn((d_ff, d_model))* 0.1).requires_grad_(True)
+    params['b1'] = torch.zeros(d_ff, requires_grad=True)
+    params['b2'] = torch.zeros(d_model, requires_grad=True)
+
+
+    params['self_gamma'] = torch.ones(d_model, requires_grad=True)
+    params['self_beta'] = torch.zeros(d_model, requires_grad=True)
+    params['cross_gamma'] = torch.ones(d_model, requires_grad=True)
+    params['cross_beta'] = torch.zeros(d_model, requires_grad=True)
+    params['ffn_gamma'] = torch.ones(d_model, requires_grad=True)
+    params['ffn_beta'] = torch.zeros(d_model, requires_grad=True)
+
+    return params
 
 # Step 54 - init_embedding_and_projection_parameters (not yet solved)
 # TODO: implement
