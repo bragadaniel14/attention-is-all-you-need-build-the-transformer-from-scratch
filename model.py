@@ -678,13 +678,21 @@ def zero_all_parameter_gradients(parameter_list):
 # Step 71 - compute_batch_training_loss
 def compute_batch_training_loss(src_batch, tgt_batch, model_params, config):
     # TODO: shift targets right, run the forward pass, build smoothed targets, and average the KL loss over non-pad tokens.
+    if 'token_embedding' not in model_params:
+        model_params['token_embedding'] = model_params.get(
+            'tgt_embedding', model_params.get('src_embedding')
+        )
+    
     new_tgt = shift_targets_right_with_start_token(tgt_batch, config['start_id'])
     log_probabilities = run_transformer_forward(src_batch, new_tgt, model_params,config['num_heads'],config['pad_id'])
     
-    smooth_dist = build_uniform_smoothing_distribution(log_probabilities.shape, config['vocab_size'], config['smoothing'])
-    smooth_dist = set_confidence_on_gold_tokens(smooth_dist, gold_token_ids, confidence)
-    
-    return 1.0
+    confidence = 1 -config['smoothing']
+    smoothed = build_uniform_smoothing_distribution(log_probabilities.shape, config['vocab_size'], config['smoothing'])
+    smoothed = set_confidence_on_gold_tokens(smoothed, tgt_batch, confidence)
+    smoothed = zero_pad_column_and_pad_token_rows(smoothed, tgt_batch,config['pad_id'])
+
+    total_loss = compute_label_smoothed_kl_loss(log_probabilities, smoothed)
+    return average_loss_over_non_pad_tokens(total_loss, tgt_batch, config['pad_id'])
 
 # Step 72 - run_training_step_with_backprop (not yet solved)
 # TODO: implement
