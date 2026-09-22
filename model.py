@@ -359,9 +359,9 @@ import torch
 
 def decoder_layer_cross_attention_sublayer(y, encoder_output, w_q, w_k, w_v, w_o, gamma, beta, num_heads, src_mask):
     # TODO: run multi-head cross-attention (Q from y, K/V from encoder_output) and wrap with add-and-norm
-    if src_mask is not None:
-        B,L = src_mask.shape
-        src_mask = src_mask.view(B,1,1,L)
+    if src_mask is not None and src_mask.dim() == 2:
+        B, L = src_mask.shape
+        src_mask = src_mask.view(B, 1, 1, L)
     merged_context = assemble_multi_head_attention_forward(y,encoder_output,encoder_output,w_q,w_k,w_v,w_o,num_heads, src_mask)
     return apply_residual_add_and_norm(y, merged_context, gamma, beta)
 
@@ -679,13 +679,12 @@ def zero_all_parameter_gradients(parameter_list):
 def compute_batch_training_loss(src_batch, tgt_batch, model_params, config):
     # TODO: shift targets right, run the forward pass, build smoothed targets, and average the KL loss over non-pad tokens.
     new_tgt = shift_targets_right_with_start_token(tgt_batch, config['start_id'])
-    model_params['token_embedding'] = model_params['src_embedding']
     log_probabilities = run_transformer_forward(src_batch, new_tgt, model_params,config['num_heads'],config['pad_id'])
     
     smooth_dist = build_uniform_smoothing_distribution(log_probabilities.shape, config['vocab_size'], config['smoothing'])
     smooth_dist = set_confidence_on_gold_tokens(smooth_dist, gold_token_ids, confidence)
     
-    return 0, True, True, True
+    return 1.0
 
 # Step 72 - run_training_step_with_backprop (not yet solved)
 # TODO: implement
