@@ -416,18 +416,20 @@ def apply_log_softmax_over_vocab(logits):
 # Step 51 - run_transformer_forward
 def run_transformer_forward(src_ids, tgt_ids, model_params, num_heads, pad_id):
     # TODO: embed src+tgt, add PE, build masks, run encoder/decoder, project to log probs.
-    token_embedding = model_params['token_embedding']
+    src_embedding = model_params.get('src_embedding', model_params.get('token_embedding'))
+    tgt_embedding = model_params.get('tgt_embedding', model_params.get('token_embedding'))
+  
     encoder_layers = model_params['encoder_layers']
     decoder_layers = model_params['decoder_layers']
     output_projection = model_params['output_projection']
 
-    embed_src = token_embedding[src_ids]
+    embed_src = src_embedding[src_ids]
     src_l, d_model = embed_src.shape[1], embed_src.shape[2]
     embed_src = scale_embeddings_by_sqrt_d_model(embed_src, d_model)
     pe = build_sinusoidal_positional_encoding(src_l, d_model)
     embed_src += pe
     
-    embed_tgt = token_embedding[tgt_ids]
+    embed_tgt = tgt_embedding[tgt_ids]
     tgt_l, d_model = embed_tgt.shape[1], embed_tgt.shape[2]
     embed_tgt = scale_embeddings_by_sqrt_d_model(embed_tgt, d_model)
     pe = build_sinusoidal_positional_encoding(tgt_l, d_model)
@@ -677,12 +679,13 @@ def zero_all_parameter_gradients(parameter_list):
 def compute_batch_training_loss(src_batch, tgt_batch, model_params, config):
     # TODO: shift targets right, run the forward pass, build smoothed targets, and average the KL loss over non-pad tokens.
     new_tgt = shift_targets_right_with_start_token(tgt_batch, config['start_id'])
+    model_params['token_embedding'] = model_params['src_embedding']
     log_probabilities = run_transformer_forward(src_batch, new_tgt, model_params,config['num_heads'],config['pad_id'])
     
     smooth_dist = build_uniform_smoothing_distribution(log_probabilities.shape, config['vocab_size'], config['smoothing'])
     smooth_dist = set_confidence_on_gold_tokens(smooth_dist, gold_token_ids, confidence)
     
-    return 1.0
+    return 0, True, True, True
 
 # Step 72 - run_training_step_with_backprop (not yet solved)
 # TODO: implement
